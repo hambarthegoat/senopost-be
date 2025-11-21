@@ -23,76 +23,125 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**SenoPost Backend** - A NestJS-based authentication service with JWT token management and type-safe DTOs. Built with TypeScript, Passport.js, and Bun.
 
-## Project setup
+## API Documentation
+
+📖 **See [API_DOCS.md](./API_DOCS.md) for comprehensive API documentation including:**
+- Authentication flow
+- All available endpoints
+- Request/Response examples
+- DTOs and type definitions
+- Error handling reference
+
+## Project Setup
 
 ```bash
+# Using Bun (recommended)
 $ bun install
+
+# Or using npm
+$ npm install
 ```
 
-## Compile and run the project
+## Development
 
 ```bash
-# development
-$ bun run start
-
-# watch mode
+# Start development server (watch mode)
 $ bun run start:dev
 
-# production mode
+# Start with debugging
+$ bun run start:debug
+
+# Build for production
+$ bun run build
+
+# Start production server
 $ bun run start:prod
 ```
 
-## Run tests
+## Code Quality
 
 ```bash
-# unit tests
-$ bun run test
+# Format code with Prettier
+$ bun run format
 
-# e2e tests
-$ bun run test:e2e
+# Run linter
+$ bun run lint
+```
 
-# test coverage
-$ bun run test:cov
+## Running Tests
+
+```bash
+# Note: Tests currently disabled. To re-enable, see API_DOCS.md
 ```
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+When you're ready to deploy your NestJS application to production, check out the [deployment documentation](https://docs.nestjs.com/deployment).
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Project Features
 
-```bash
-$ bun install -g @nestjs/mau
-$ mau deploy
+- ✅ **JWT Authentication** - Secure token-based authentication with Passport.js
+- ✅ **Type-Safe DTOs** - Full TypeScript typing for request/response validation
+- ✅ **Password Hashing** - Bcrypt-based password encryption
+- ✅ **Error Handling** - Standardized NestJS error responses
+- 🔄 **Upcoming:** Database persistence with Prisma ORM
+- 🔄 **Upcoming:** User profile endpoints
+- 🔄 **Upcoming:** Email verification and password reset
+
+## Architecture
+
+```
+src/
+├── auth/
+│   ├── dto/auth.dto.ts              # Type-safe request/response DTOs
+│   ├── interfaces/jwt-payload.interface.ts
+│   ├── auth.controller.ts            # Authentication endpoints
+│   ├── auth.service.ts               # Business logic
+│   ├── auth.module.ts                # Module configuration
+│   ├── jwt.guard.ts                  # JWT protection guard
+│   └── jwt.strategy.ts               # Passport JWT strategy
+├── app.controller.ts                 # Health check endpoint
+├── app.module.ts                     # Root module
+└── main.ts                           # Application entry
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Quick Start
+
+1. **Install dependencies:**
+   ```bash
+   bun install
+   ```
+
+2. **Start development server:**
+   ```bash
+   bun run start:dev
+   ```
+
+3. **Register a user:**
+   ```bash
+   curl -X POST http://localhost:3000/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email":"user@example.com","password":"Password123"}'
+   ```
+
+4. **Login:**
+   ```bash
+   curl -X POST http://localhost:3000/auth/login \
+     -H "Content-Type: application/json" \
+     -d '{"email":"user@example.com","password":"Password123"}'
+   ```
+
+See [API_DOCS.md](./API_DOCS.md) for full documentation.
 
 ## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- [NestJS Documentation](https://docs.nestjs.com) - Learn more about the NestJS framework
+- [Passport.js](http://www.passportjs.org/) - Authentication middleware
+- [JWT.io](https://jwt.io/) - Learn about JSON Web Tokens
+- [Prisma](https://www.prisma.io/) - Next-generation ORM (planned integration)
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED
