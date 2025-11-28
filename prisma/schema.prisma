@@ -2,12 +2,81 @@ generator client {
   provider = "prisma-client-js"
 }
 
-datasource at {
-  provider  = "postgresql"
+datasource db {
+  provider = "postgresql"
+}
+
+enum VoteTargetType {
+  post
+  comment
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String?
+  provider   String?
+  sub        String?  @unique
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  communities Community[]
+  posts       Post[]
+  comments    Comment[]
+  votes       Vote[]
+}
+
+model Community {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  posts Post[]
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  title       String
+  content     String?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  score       Int      @default(0)
+
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id])
+  parentId  String?
+  parent    Comment? @relation("CommentToComment", fields: [parentId], references: [id])
+  children  Comment[] @relation("CommentToComment")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  score     Int      @default(0)
+}
+
+model Vote {
+  userId     String
+  targetId   String
+  targetType VoteTargetType
+  value      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([userId, targetId, targetType])
 }

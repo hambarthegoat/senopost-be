@@ -3,6 +3,7 @@ export interface AuthDto {
   password: string;
 }
 
-export interface TokenResponse {
-  access_token: string;
+export interface LoginResponse {
+  token: string | null;
+  user_id: string | null;
 }

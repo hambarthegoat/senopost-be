@@ -145,3 +145,15 @@ See [API_DOCS.md](./API_DOCS.md) for full documentation.
 ## License
 
 UNLICENSED
+
+## Prisma & Local Development
+
+Set `DATABASE_URL` in your environment (e.g. `.env`) to a Postgres connection string and run:
+
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+npm install
+npm run start:dev
+```
+

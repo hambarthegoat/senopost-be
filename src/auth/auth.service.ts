@@ -1,36 +1,31 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import type { AuthDto, TokenResponse } from './dto/auth.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import type { AuthDto } from './dto/auth.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private jwt: JwtService) {}
+  constructor(private jwt: JwtService, private prisma: PrismaService) {}
 
-  private users: { email: string; password: string }[] = [];
-
-  async register(dto: AuthDto): Promise<{ message: string }> {
+  async register(dto: AuthDto) {
     const hashed = await bcrypt.hash(dto.password, 10);
-
-    this.users.push({
-      email: dto.email,
-      password: hashed,
-    });
-
-    return { message: 'User registered' };
+    const user = await this.prisma.user.create({ data: { email: dto.email, password: hashed } });
+    return { id: user.id, email: user.email };
   }
 
-  async login(dto: AuthDto): Promise<TokenResponse> {
-    const user = this.users.find(u => u.email === dto.email);
-    if (!user) throw new UnauthorizedException('User not found');
+  async login(dto: AuthDto) {
+    const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
+    if (!user || !user.password) throw new UnauthorizedException('Invalid credentials');
 
     const match = await bcrypt.compare(dto.password, user.password);
-    if (!match) throw new UnauthorizedException('Invalid password');
+    if (!match) throw new UnauthorizedException('Invalid credentials');
 
-    const token = await this.jwt.signAsync({
-      email: user.email,
-    });
+    const token = await this.jwt.signAsync({ sub: user.id, email: user.email });
+    return { token, user_id: user.id };
+  }
 
-    return { access_token: token };
+  async validateUserById(id: string) {
+    return this.prisma.user.findUnique({ where: { id }, select: { id: true, email: true } });
   }
 }
