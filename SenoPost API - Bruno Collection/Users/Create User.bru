@@ -1,18 +1,18 @@
 meta {
-  name: Create User
+  name: Create User (DEPRECATED)
   type: http
   seq: 1
 }
 
+# Use the public registration endpoint instead of creating users as admin.
 post {
-  url: {{base_url}}/users
+  url: {{base_url}}/auth/register
   body: json
-  auth: inherit
+  auth: none
 }
 
 headers {
   Content-Type: application/json
-  Authorization: Bearer {{token}}
 }
 
 body:json {
@@ -27,5 +27,5 @@ settings {
 }
 
 docs {
-  Create user (admin style) - this endpoint exists in API but may be similar to auth/register.
+  Deprecated: use `POST /auth/register` to create a new end-user account. This request kept for backward reference.
 }

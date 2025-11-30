@@ -1,19 +1,24 @@
 meta {
   name: Get User
   type: http
-  seq: 2
+  seq: 4
 }
 
 get {
-  url: {{base_url}}/users/:id
+  url: {{base_url}}/user/:id
   body: none
   auth: inherit
 }
 
+params:path {
+  id: 
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }
 
 docs {
-  Get user by id.
+  Get another user's profile by id (public).
 }

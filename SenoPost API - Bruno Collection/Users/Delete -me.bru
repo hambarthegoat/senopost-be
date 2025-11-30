@@ -1,11 +1,11 @@
 meta {
   name: Delete /me
   type: http
-  seq: 4
+  seq: 3
 }
 
 delete {
-  url: {{base_url}}/users/me
+  url: {{base_url}}/me
   body: none
   auth: inherit
 }
@@ -16,8 +16,9 @@ headers {
 
 settings {
   encodeUrl: true
+  timeout: 0
 }
 
 docs {
-  Delete the current authenticated user's account using `DELETE /users/me`. Requires Authorization header.
+  Delete current authenticated user's account. Requires Authorization.
 }
