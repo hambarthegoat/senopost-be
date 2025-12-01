@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Delete, UseGuards, Req, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Delete, UseGuards, Req, Body, UnauthorizedException, HttpCode, HttpStatus } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,7 +10,8 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  me(@Req() req: Request & { user?: any }) {
+  @HttpCode(HttpStatus.OK)
+  async me(@Req() req: Request & { user?: any }) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('Not authenticated');
     return this.users.findOne(userId);
@@ -18,7 +19,8 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('me')
-  updateMe(@Req() req: Request & { user?: any }, @Body() dto: UpdateUserDto) {
+  @HttpCode(HttpStatus.OK)
+  async updateMe(@Req() req: Request & { user?: any }, @Body() dto: UpdateUserDto) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('Not authenticated');
     return this.users.update(userId, dto);
@@ -26,15 +28,16 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async removeMe(@Req() req: Request & { user?: any }) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('Not authenticated');
     await this.users.remove(userId);
-    return { statusCode: 204 };
   }
 
   @Get('user/:id')
-  findOne(@Param('id') id: string) {
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string) {
     return this.users.findOne(id);
   }
 }

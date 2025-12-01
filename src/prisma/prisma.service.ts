@@ -6,22 +6,37 @@ import { PrismaPg } from '@prisma/adapter-pg';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
-    const connectionString = (
-      process.env.DIRECT_URL ?? 
-      process.env.DATABASE_URL ?? 
-      process.env.SUPABASE_DB_URL ?? 
-      process.env.SUPABASE_URL
-    )?.replace(/^"|"$/g, '');
+    // Use DATABASE_URL for queries (with pgbouncer)
+    const connectionString = process.env.DATABASE_URL;
 
     if (!connectionString) {
-      throw new Error('Database connection string not found in environment variables');
+      throw new Error('DATABASE_URL not found in environment variables');
     }
 
-    super({ adapter: new PrismaPg(new Pool({ connectionString })) });
+    // Remove pgbouncer parameter from connection string for the Pool
+    const poolConnectionString = connectionString.replace('?pgbouncer=true', '').replace('&pgbouncer=true', '');
+
+    const pool = new Pool({ 
+      connectionString: poolConnectionString,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+      allowExitOnIdle: false,
+    });
+
+    super({ 
+      adapter: new PrismaPg(pool),
+    });
   }
 
   async onModuleInit() {
-    await this.$connect();
+    try {
+      await this.$connect();
+      console.log('✅ Database connected successfully');
+    } catch (error) {
+      console.error('❌ Database connection failed:', error);
+      throw error;
+    }
   }
 
   async onModuleDestroy() {

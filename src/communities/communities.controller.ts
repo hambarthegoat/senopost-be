@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards, Request, Get, Param, Patch, Delete } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Request, Get, Param, Patch, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { CommunitiesService } from './communities.service';
 import { CreateCommunityDto } from './dto/create-community.dto';
 import { UpdateCommunityDto } from './dto/update-community.dto';
@@ -10,30 +10,34 @@ export class CommunitiesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() dto: CreateCommunityDto, @Request() req: any) {
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() dto: CreateCommunityDto, @Request() req: any) {
     return this.svc.create(dto, req.user?.sub || req.user?.id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string) {
     return this.svc.findOne(id);
   }
 
   @Get(':id/posts')
-  posts(@Param('id') id: string) {
+  @HttpCode(HttpStatus.OK)
+  async posts(@Param('id') id: string) {
     return this.svc.postsForCommunity(id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateCommunityDto) {
+  @HttpCode(HttpStatus.OK)
+  async update(@Param('id') id: string, @Body() dto: UpdateCommunityDto) {
     return this.svc.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
     await this.svc.remove(id);
-    return { statusCode: 204 };
   }
 }

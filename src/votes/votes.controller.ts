@@ -1,4 +1,4 @@
-import { Controller, Post, Param, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Param, Body, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { VotesService } from './votes.service';
 import { VoteDto } from './dto/vote.dto';
 import { JwtAuthGuard } from '../auth/jwt.guard';
@@ -9,14 +9,16 @@ export class VotesController {
 
   @UseGuards(JwtAuthGuard)
   @Post('posts/:id/votes')
-  votePost(@Param('id') id: string, @Body() dto: VoteDto, @Request() req: any) {
+  @HttpCode(HttpStatus.OK)
+  async votePost(@Param('id') id: string, @Body() dto: VoteDto, @Request() req: any) {
     const userId = req.user?.sub || req.user?.id;
     return this.svc.votePost(id, userId, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('comments/:id/votes')
-  voteComment(@Param('id') id: string, @Body() dto: VoteDto, @Request() req: any) {
+  @HttpCode(HttpStatus.OK)
+  async voteComment(@Param('id') id: string, @Body() dto: VoteDto, @Request() req: any) {
     const userId = req.user?.sub || req.user?.id;
     return this.svc.voteComment(id, userId, dto);
   }
