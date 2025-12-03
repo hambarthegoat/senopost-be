@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
@@ -8,34 +7,6 @@ import { Prisma } from '@prisma/client';
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
-
-  async create(dto: CreateUserDto) {
-    try {
-      if (!dto.email) {
-        throw new BadRequestException('Email is required');
-      }
-
-      const hashed = dto.password ? await bcrypt.hash(dto.password, 10) : null;
-      const user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          password: hashed,
-        },
-        select: { id: true, email: true },
-      });
-      return user;
-    } catch (error) {
-      if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === 'P2002') {
-          throw new ConflictException('Email already exists');
-        }
-      }
-      if (error instanceof BadRequestException || error instanceof ConflictException) {
-        throw error;
-      }
-      throw new InternalServerErrorException('Failed to create user');
-    }
-  }
 
   async findOne(id: string) {
     try {

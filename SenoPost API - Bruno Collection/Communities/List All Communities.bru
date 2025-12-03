@@ -1,0 +1,26 @@
+meta {
+  name: List All Communities
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/communities
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
+
+docs {
+  Get a list of all communities.
+  
+  **Response:**
+  Returns an array of community objects with id, name, description, and createdAt.
+  
+  **Authentication:**
+  No authentication required.
+}

@@ -8,6 +8,12 @@ import { JwtAuthGuard } from '../auth/jwt.guard';
 export class CommunitiesController {
   constructor(private svc: CommunitiesService) {}
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
+    return this.svc.findAll();
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.CREATED)

@@ -8,6 +8,21 @@ import { Prisma } from '@prisma/client';
 export class CommunitiesService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll() {
+    try {
+      return this.prisma.community.findMany({
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          createdAt: true,
+        },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch communities');
+    }
+  }
+
   async create(dto: CreateCommunityDto, creatorId: string) {
     try {
       if (!dto.name) {

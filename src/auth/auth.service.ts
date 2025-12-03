@@ -3,16 +3,17 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthDto } from './dto/auth.dto';
+import { RegisterDto } from './dto/register.dto';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
   constructor(private jwt: JwtService, private prisma: PrismaService) {}
 
-  async register(dto: AuthDto) {
+  async register(dto: RegisterDto) {
     try {
-      if (!dto.email || !dto.password) {
-        throw new BadRequestException('Email and password are required');
+      if (!dto.email || !dto.password || !dto.username) {
+        throw new BadRequestException('Email, password, and username are required');
       }
 
       if (dto.password.length < 6) {
@@ -20,12 +21,19 @@ export class AuthService {
       }
 
       const hashed = await bcrypt.hash(dto.password, 10);
-      const user = await this.prisma.user.create({ data: { email: dto.email, password: hashed } });
-      return { id: user.id, email: user.email };
+      const user = await this.prisma.user.create({ 
+        data: { 
+          email: dto.email, 
+          password: hashed, 
+          username: dto.username,
+          photo: dto.photo || null
+        } 
+      });
+      return { id: user.id, email: user.email, username: user.username };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ConflictException('Email already exists');
+          throw new ConflictException('Email or username already exists');
         }
       }
       if (error instanceof BadRequestException || error instanceof ConflictException) {
