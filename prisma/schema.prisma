@@ -21,11 +21,16 @@ model User {
   email      String   @unique
   username   String?
   photo      String?
+  bio        String?
   password   String?
   provider   String?
   sub        String?  @unique
   nsfwEnabled Boolean @default(false)
   spoilerEnabled Boolean @default(false)
+  linkX      String?
+  linkGithub String?
+  linkWebsite String?
+  linkInstagram String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

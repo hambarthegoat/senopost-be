@@ -7,7 +7,12 @@ CREATE TYPE "FollowTargetType" AS ENUM ('user', 'community');
 -- Add preference fields to User table
 ALTER TABLE "User" 
 ADD COLUMN "nsfwEnabled" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN "spoilerEnabled" BOOLEAN NOT NULL DEFAULT false;
+ADD COLUMN "spoilerEnabled" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN "bio" TEXT,
+ADD COLUMN "linkX" TEXT,
+ADD COLUMN "linkGithub" TEXT,
+ADD COLUMN "linkWebsite" TEXT,
+ADD COLUMN "linkInstagram" TEXT;
 
 -- Add NSFW and spoiler fields to Post table
 ALTER TABLE "Post"

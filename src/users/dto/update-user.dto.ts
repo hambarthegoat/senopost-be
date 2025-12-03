@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, MinLength, IsBoolean } from 'class-validator';
+import { IsEmail, IsOptional, IsString, MinLength, IsBoolean, IsUrl } from 'class-validator';
 
 export class UpdateUserDto {
   @IsEmail()
@@ -18,6 +18,10 @@ export class UpdateUserDto {
   @IsOptional()
   photo?: string;
 
+  @IsString()
+  @IsOptional()
+  bio?: string;
+
   @IsBoolean()
   @IsOptional()
   nsfwEnabled?: boolean;
@@ -25,4 +29,20 @@ export class UpdateUserDto {
   @IsBoolean()
   @IsOptional()
   spoilerEnabled?: boolean;
+
+  @IsString()
+  @IsOptional()
+  linkX?: string;
+
+  @IsString()
+  @IsOptional()
+  linkGithub?: string;
+
+  @IsString()
+  @IsOptional()
+  linkWebsite?: string;
+
+  @IsString()
+  @IsOptional()
+  linkInstagram?: string;
 }

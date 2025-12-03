@@ -21,8 +21,13 @@ export class UsersService {
           email: true, 
           username: true, 
           photo: true,
+          bio: true,
           nsfwEnabled: true,
           spoilerEnabled: true,
+          linkX: true,
+          linkGithub: true,
+          linkWebsite: true,
+          linkInstagram: true,
           posts: {
             select: {
               id: true,
@@ -60,10 +65,15 @@ export class UsersService {
       if (dto.password) data.password = await bcrypt.hash(dto.password, 10);
       if (dto.username !== undefined) data.username = dto.username;
       if (dto.photo !== undefined) data.photo = dto.photo;
+      if (dto.bio !== undefined) data.bio = dto.bio;
       if (dto.nsfwEnabled !== undefined) data.nsfwEnabled = dto.nsfwEnabled;
       if (dto.spoilerEnabled !== undefined) data.spoilerEnabled = dto.spoilerEnabled;
+      if (dto.linkX !== undefined) data.linkX = dto.linkX;
+      if (dto.linkGithub !== undefined) data.linkGithub = dto.linkGithub;
+      if (dto.linkWebsite !== undefined) data.linkWebsite = dto.linkWebsite;
+      if (dto.linkInstagram !== undefined) data.linkInstagram = dto.linkInstagram;
 
-      const user = await this.prisma.user.update({ where: { id }, data, select: { id: true, email: true, username: true, photo: true, nsfwEnabled: true, spoilerEnabled: true } });
+      const user = await this.prisma.user.update({ where: { id }, data, select: { id: true, email: true, username: true, photo: true, bio: true, nsfwEnabled: true, spoilerEnabled: true, linkX: true, linkGithub: true, linkWebsite: true, linkInstagram: true } });
       return user;
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
