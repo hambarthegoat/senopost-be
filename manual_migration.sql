@@ -1,8 +1,8 @@
--- Manual Migration: Add preferences and follows
+-- Manual Migration: Add preferences, follows, and community author
 -- Run this in Supabase SQL Editor
 
 -- Add new enum for follow target type
-CREATE TYPE "FollowTargetType" AS ENUM ('user', 'community');
+CREATE TYPE "FollowTargetType" AS ENUM ('community');
 
 -- Add preference fields to User table
 ALTER TABLE "User" 
@@ -18,6 +18,10 @@ ADD COLUMN "linkInstagram" TEXT;
 ALTER TABLE "Post"
 ADD COLUMN "isNsfw" BOOLEAN NOT NULL DEFAULT false,
 ADD COLUMN "isSpoiler" BOOLEAN NOT NULL DEFAULT false;
+
+-- Rename creatorId to authorId in Community table
+ALTER TABLE "Community" 
+RENAME COLUMN "creatorId" TO "authorId";
 
 -- Create Follow table
 CREATE TABLE "Follow" (

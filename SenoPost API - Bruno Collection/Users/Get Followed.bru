@@ -20,12 +20,10 @@ settings {
 }
 
 docs {
-  Get list of followed users and communities for the authenticated user.
+  Get list of followed communities for the authenticated user.
   
   **Response:**
-  Returns an object with two arrays:
-  - `users`: Array of followed users (id, username, photo)
-  - `communities`: Array of followed communities (id, name, description)
+  Returns an array of followed communities with id, name, and description.
   
   **Authentication:**
   Requires Bearer token.

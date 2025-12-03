@@ -5,13 +5,18 @@ meta {
 }
 
 get {
-  url: {{base_url}}/communities/:id/posts
+  url: {{base_url}}/communities/d0a3f297-61a0-4654-969b-82fa4e659b7c/posts
   body: none
   auth: inherit
 }
 
+vars:pre-request {
+  id: d0a3f297-61a0-4654-969b-82fa4e659b7c
+}
+
 settings {
   encodeUrl: true
+  timeout: 0
 }
 
 docs {

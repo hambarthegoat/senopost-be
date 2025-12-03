@@ -8,6 +8,70 @@ import { Prisma } from '@prisma/client';
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
+  async findAll() {
+    try {
+      const posts = await this.prisma.post.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          community: {
+            select: {
+              name: true,
+            },
+          },
+          author: {
+            select: {
+              username: true,
+            },
+          },
+          comments: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+
+      return posts.map((post) => ({
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        img: post.img,
+        isNsfw: post.isNsfw,
+        isSpoiler: post.isSpoiler,
+        community: post.community.name,
+        author: post.author.username,
+        upvotes: post.score,
+        commentCount: post.comments.length,
+        timeAgo: this.getTimeAgo(post.updatedAt),
+      }));
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch all posts');
+    }
+  }
+
+  private getTimeAgo(date: Date): string {
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - new Date(date).getTime()) / 1000);
+
+    const intervals = [
+      { label: 'year', seconds: 31536000 },
+      { label: 'month', seconds: 2592000 },
+      { label: 'day', seconds: 86400 },
+      { label: 'hour', seconds: 3600 },
+      { label: 'minute', seconds: 60 },
+      { label: 'second', seconds: 1 },
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(seconds / interval.seconds);
+      if (count >= 1) {
+        return `${count} ${interval.label}${count !== 1 ? 's' : ''} ago`;
+      }
+    }
+
+    return 'just now';
+  }
+
   async create(communityId: string, dto: CreatePostDto, authorId: string) {
     try {
       if (!dto.title) {

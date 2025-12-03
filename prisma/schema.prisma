@@ -12,7 +12,6 @@ enum VoteTargetType {
 }
 
 enum FollowTargetType {
-  user
   community
 }
 
@@ -45,8 +44,8 @@ model Community {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
-  creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

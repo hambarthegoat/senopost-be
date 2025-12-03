@@ -1,0 +1,30 @@
+meta {
+  name: List All Posts
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/posts
+  body: none
+  auth: none
+}
+
+docs {
+  Get all posts from all communities with aggregated data.
+  
+  Response includes:
+  - id: Post ID
+  - title: Post title
+  - content: Post content (optional)
+  - img: Post image URL (optional)
+  - isNsfw: Whether post is NSFW
+  - isSpoiler: Whether post contains spoilers
+  - community: Community name
+  - author: Username of post author
+  - upvotes: Post score (number of votes)
+  - commentCount: Number of comments
+  - timeAgo: Human-readable time since last update (e.g., "5 hours ago")
+  
+  No authentication required.
+}

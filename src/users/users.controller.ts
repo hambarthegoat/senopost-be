@@ -51,7 +51,7 @@ export class UsersController {
   async follow(@Req() req: Request & { user?: any }, @Body() dto: FollowDto) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('Not authenticated');
-    return this.users.follow(userId, dto.targetId, dto.targetType);
+    return this.users.follow(userId, dto.communityId);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -60,7 +60,7 @@ export class UsersController {
   async unfollow(@Req() req: Request & { user?: any }, @Body() dto: FollowDto) {
     const userId = req.user?.sub;
     if (!userId) throw new UnauthorizedException('Not authenticated');
-    return this.users.unfollow(userId, dto.targetId, dto.targetType);
+    return this.users.unfollow(userId, dto.communityId);
   }
 
   @Get('user/:id')

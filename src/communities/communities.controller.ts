@@ -43,7 +43,8 @@ export class CommunitiesController {
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id') id: string) {
-    await this.svc.remove(id);
+  async remove(@Param('id') id: string, @Request() req: any) {
+    const userId = req.user?.sub || req.user?.id;
+    await this.svc.remove(id, userId);
   }
 }

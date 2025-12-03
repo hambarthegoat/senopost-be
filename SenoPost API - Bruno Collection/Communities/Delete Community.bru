@@ -20,4 +20,8 @@ settings {
 
 docs {
   Delete community (requires auth). Returns 204-style response object.
+  
+  **Authorization:**
+  Only the author (creator) of the community can delete it.
+  Attempting to delete a community you didn't create will result in a 400 error.
 }

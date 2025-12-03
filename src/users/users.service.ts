@@ -118,78 +118,58 @@ export class UsersService {
       }
 
       const follows = await this.prisma.follow.findMany({
-        where: { userId },
+        where: { 
+          userId,
+          targetType: 'community'
+        },
         select: {
           targetId: true,
-          targetType: true,
           createdAt: true
         }
       });
 
-      // Separate user and community follows
-      const userFollows = follows.filter(f => f.targetType === 'user');
-      const communityFollows = follows.filter(f => f.targetType === 'community');
-
-      // Fetch details for followed users
-      const followedUsers = await this.prisma.user.findMany({
-        where: { id: { in: userFollows.map(f => f.targetId) } },
-        select: { id: true, username: true, photo: true }
-      });
-
       // Fetch details for followed communities
       const followedCommunities = await this.prisma.community.findMany({
-        where: { id: { in: communityFollows.map(f => f.targetId) } },
+        where: { id: { in: follows.map(f => f.targetId) } },
         select: { id: true, name: true, description: true }
       });
 
-      return {
-        users: followedUsers,
-        communities: followedCommunities
-      };
+      return followedCommunities;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new InternalServerErrorException('Failed to fetch followed items');
+      throw new InternalServerErrorException('Failed to fetch followed communities');
     }
   }
 
-  async follow(userId: string, targetId: string, targetType: 'user' | 'community') {
+  async follow(userId: string, communityId: string) {
     try {
       if (!userId) {
         throw new BadRequestException('User ID is required');
       }
 
-      if (!targetId) {
-        throw new BadRequestException('Target ID is required');
+      if (!communityId) {
+        throw new BadRequestException('Community ID is required');
       }
 
-      if (userId === targetId && targetType === 'user') {
-        throw new BadRequestException('Cannot follow yourself');
-      }
-
-      // Verify target exists
-      if (targetType === 'user') {
-        const targetUser = await this.prisma.user.findUnique({ where: { id: targetId } });
-        if (!targetUser) throw new NotFoundException('User not found');
-      } else {
-        const targetCommunity = await this.prisma.community.findUnique({ where: { id: targetId } });
-        if (!targetCommunity) throw new NotFoundException('Community not found');
-      }
+      // Verify community exists
+      const targetCommunity = await this.prisma.community.findUnique({ where: { id: communityId } });
+      if (!targetCommunity) throw new NotFoundException('Community not found');
 
       const follow = await this.prisma.follow.create({
         data: {
           userId,
-          targetId,
-          targetType
+          targetId: communityId,
+          targetType: 'community'
         }
       });
 
-      return { message: 'Successfully followed', follow };
+      return { message: 'Successfully followed community', follow };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
-          throw new ConflictException('Already following');
+          throw new ConflictException('Already following this community');
         }
         if (error.code === 'P2003') {
           throw new NotFoundException('User not found');
@@ -198,41 +178,41 @@ export class UsersService {
       if (error instanceof BadRequestException || error instanceof NotFoundException || error instanceof ConflictException) {
         throw error;
       }
-      throw new InternalServerErrorException('Failed to follow');
+      throw new InternalServerErrorException('Failed to follow community');
     }
   }
 
-  async unfollow(userId: string, targetId: string, targetType: 'user' | 'community') {
+  async unfollow(userId: string, communityId: string) {
     try {
       if (!userId) {
         throw new BadRequestException('User ID is required');
       }
 
-      if (!targetId) {
-        throw new BadRequestException('Target ID is required');
+      if (!communityId) {
+        throw new BadRequestException('Community ID is required');
       }
 
       await this.prisma.follow.delete({
         where: {
           userId_targetId_targetType: {
             userId,
-            targetId,
-            targetType
+            targetId: communityId,
+            targetType: 'community'
           }
         }
       });
 
-      return { message: 'Successfully unfollowed' };
+      return { message: 'Successfully unfollowed community' };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2025') {
-          throw new NotFoundException('Follow relationship not found');
+          throw new NotFoundException('Not following this community');
         }
       }
       if (error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
       }
-      throw new InternalServerErrorException('Failed to unfollow');
+      throw new InternalServerErrorException('Failed to unfollow community');
     }
   }
 }

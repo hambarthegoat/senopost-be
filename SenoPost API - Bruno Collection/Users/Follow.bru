@@ -17,8 +17,7 @@ headers {
 
 body:json {
   {
-    "targetId": "user-id-or-community-id",
-    "targetType": "user"
+    "communityId": "community-id-here"
   }
 }
 
@@ -28,19 +27,17 @@ settings {
 }
 
 docs {
-  Follow a user or community.
+  Follow a community.
   
   **Request Body:**
-  - `targetId` (required): ID of the user or community to follow
-  - `targetType` (required): Either "user" or "community"
+  - `communityId` (required): ID of the community to follow
   
   **Response:**
   Returns success message and follow object.
   
   **Validations:**
-  - Cannot follow yourself
-  - Target must exist
-  - Cannot follow same target twice
+  - Community must exist
+  - Cannot follow same community twice
   
   **Authentication:**
   Requires Bearer token.

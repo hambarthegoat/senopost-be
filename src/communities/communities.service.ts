@@ -10,15 +10,25 @@ export class CommunitiesService {
 
   async findAll() {
     try {
-      return this.prisma.community.findMany({
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          createdAt: true,
+      const communities = await this.prisma.community.findMany({
+        include: {
+          author: {
+            select: {
+              username: true,
+            },
+          },
         },
       });
+
+      return communities.map((community) => ({
+        id: community.id,
+        name: community.name,
+        description: community.description,
+        author: community.author?.username || 'Unknown',
+        createdAt: community.createdAt,
+      }));
     } catch (error) {
+      console.error('Error fetching communities:', error);
       throw new InternalServerErrorException('Failed to fetch communities');
     }
   }
@@ -37,7 +47,7 @@ export class CommunitiesService {
         data: {
           name: dto.name,
           description: dto.description,
-          creatorId,
+          authorId: creatorId,
         },
       });
       return community;
@@ -63,10 +73,28 @@ export class CommunitiesService {
         throw new BadRequestException('Community ID is required');
       }
 
-      const community = await this.prisma.community.findUnique({ where: { id } });
+      const community = await this.prisma.community.findUnique({ 
+        where: { id },
+        include: {
+          author: {
+            select: {
+              username: true,
+            },
+          },
+        },
+      });
       if (!community) throw new NotFoundException('Community not found');
-      return community;
+      
+      return {
+        id: community.id,
+        name: community.name,
+        description: community.description,
+        author: community.author?.username || 'Unknown',
+        createdAt: community.createdAt,
+        updatedAt: community.updatedAt,
+      };
     } catch (error) {
+      console.error('Error fetching community:', error);
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
@@ -94,10 +122,20 @@ export class CommunitiesService {
     }
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId: string) {
     try {
       if (!id) {
         throw new BadRequestException('Community ID is required');
+      }
+
+      // Check if the community exists and if the user is the author
+      const community = await this.prisma.community.findUnique({ where: { id } });
+      if (!community) {
+        throw new NotFoundException('Community not found');
+      }
+
+      if (community.authorId !== userId) {
+        throw new BadRequestException('Only the author can delete this community');
       }
 
       await this.prisma.community.delete({ where: { id } });
@@ -120,8 +158,18 @@ export class CommunitiesService {
         throw new BadRequestException('Community ID is required');
       }
 
-      return this.prisma.post.findMany({ where: { communityId: cid }, select: { id: true, title: true, score: true } });
+      return this.prisma.post.findMany({ 
+        where: { communityId: cid }, 
+        select: { 
+          id: true, 
+          title: true, 
+          score: true,
+          createdAt: true,
+        },
+        orderBy: { createdAt: 'desc' },
+      });
     } catch (error) {
+      console.error('Error fetching community posts:', error);
       if (error instanceof BadRequestException) {
         throw error;
       }

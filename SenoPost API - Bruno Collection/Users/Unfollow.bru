@@ -17,8 +17,7 @@ headers {
 
 body:json {
   {
-    "targetId": "user-id-or-community-id",
-    "targetType": "user"
+    "communityId": "community-id-here"
   }
 }
 
@@ -28,11 +27,10 @@ settings {
 }
 
 docs {
-  Unfollow a user or community.
+  Unfollow a community.
   
   **Request Body:**
-  - `targetId` (required): ID of the user or community to unfollow
-  - `targetType` (required): Either "user" or "community"
+  - `communityId` (required): ID of the community to unfollow
   
   **Response:**
   Returns success message.
