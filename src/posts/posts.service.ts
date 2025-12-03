@@ -20,6 +20,7 @@ export class PostsService {
           },
           author: {
             select: {
+              id: true,
               username: true,
             },
           },
@@ -117,15 +118,112 @@ export class PostsService {
         throw new BadRequestException('Post ID is required');
       }
 
-      const post = await this.prisma.post.findUnique({ where: { id } });
+      const post = await this.prisma.post.findUnique({ 
+        where: { id },
+        include: {
+          community: {
+            select: {
+              name: true,
+            },
+          },
+          author: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+          comments: {
+            where: {
+              parentId: null, // Only get top-level comments
+            },
+            include: {
+              author: {
+                select: {
+                  id: true,
+                  username: true,
+                },
+              },
+              children: {
+                include: {
+                  author: {
+                    select: {
+                      id: true,
+                      username: true,
+                    },
+                  },
+                  children: {
+                    include: {
+                      author: {
+                        select: {
+                          id: true,
+                          username: true,
+                        },
+                      },
+                      children: {
+                        include: {
+                          author: {
+                            select: {
+                              id: true,
+                              username: true,
+                            },
+                          },
+                          children: true, // Support deeper nesting if needed
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            orderBy: {
+              createdAt: 'desc',
+            },
+          },
+        },
+      });
+      
       if (!post) throw new NotFoundException('Post not found');
-      return post;
+      
+      // Transform the response to match the expected format
+      return {
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        imageUrl: post.img,
+        community: post.community.name,
+        author: post.author.username,
+        upvotes: post.score,
+        commentCount: this.countAllComments(post.comments),
+        timeAgo: this.getTimeAgo(post.updatedAt),
+        comments: post.comments.map((comment) => this.formatComment(comment)),
+      };
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
       throw new InternalServerErrorException('Failed to fetch post');
     }
+  }
+
+  private formatComment(comment: any): any {
+    return {
+      id: comment.id,
+      author: comment.author.username,
+      content: comment.content,
+      upvotes: comment.score,
+      timeAgo: this.getTimeAgo(comment.updatedAt),
+      replies: comment.children ? comment.children.map((child: any) => this.formatComment(child)) : [],
+    };
+  }
+
+  private countAllComments(comments: any[]): number {
+    let count = comments.length;
+    for (const comment of comments) {
+      if (comment.children && comment.children.length > 0) {
+        count += this.countAllComments(comment.children);
+      }
+    }
+    return count;
   }
 
   async findByCommunity(cid: string) {
