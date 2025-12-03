@@ -26,19 +26,24 @@ export class CommunitiesService {
       });
 
       // Get follower counts for all communities
-      const followerCounts = await Promise.all(
-        communities.map(async (community) => {
-          const count = await this.prisma.follow.count({
-            where: {
-              targetId: community.id,
-              targetType: 'community',
-            },
-          });
-          return { id: community.id, count };
-        })
-      );
-
-      const followerMap = new Map(followerCounts.map((fc) => [fc.id, fc.count]));
+      let followerMap = new Map();
+      try {
+        const followerCounts = await Promise.all(
+          communities.map(async (community) => {
+            const count = await this.prisma.follow.count({
+              where: {
+                targetId: community.id,
+                targetType: 'community',
+              },
+            });
+            return { id: community.id, count };
+          })
+        );
+        followerMap = new Map(followerCounts.map((fc) => [fc.id, fc.count]));
+      } catch (error) {
+        console.error('Error fetching follower counts:', error);
+        // Continue without follower counts if Follow table doesn't exist
+      }
 
       return communities.map((community) => ({
         id: community.id,
@@ -107,12 +112,18 @@ export class CommunitiesService {
       if (!community) throw new NotFoundException('Community not found');
       
       // Get follower count
-      const followerCount = await this.prisma.follow.count({
-        where: {
-          targetId: id,
-          targetType: 'community',
-        },
-      });
+      let followerCount = 0;
+      try {
+        followerCount = await this.prisma.follow.count({
+          where: {
+            targetId: id,
+            targetType: 'community',
+          },
+        });
+      } catch (error) {
+        console.error('Error fetching follower count:', error);
+        // Continue without follower count if Follow table doesn't exist
+      }
 
       return {
         id: community.id,
@@ -189,12 +200,18 @@ export class CommunitiesService {
       }
 
       // Get follower count
-      const followerCount = await this.prisma.follow.count({
-        where: {
-          targetId: cid,
-          targetType: 'community',
-        },
-      });
+      let followerCount = 0;
+      try {
+        followerCount = await this.prisma.follow.count({
+          where: {
+            targetId: cid,
+            targetType: 'community',
+          },
+        });
+      } catch (error) {
+        console.error('Error fetching follower count:', error);
+        // Continue without follower count if Follow table doesn't exist
+      }
 
       const posts = await this.prisma.post.findMany({ 
         where: { communityId: cid }, 
