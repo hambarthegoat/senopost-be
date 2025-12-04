@@ -21,4 +21,15 @@ settings {
 
 docs {
   List comments for a post.
+  
+  Response includes:
+  - id: Comment ID
+  - content: Comment text
+  - author: Username of comment author (or ID if username not set)
+  - authorId: Author user ID
+  - postId: Post ID
+  - parentId: Parent comment ID (null for top-level comments)
+  - score: Comment vote score
+  - createdAt: Creation timestamp
+  - updatedAt: Last update timestamp
 }

@@ -50,7 +50,30 @@ export class CommentsService {
         throw new BadRequestException('Post ID is required');
       }
 
-      return this.prisma.comment.findMany({ where: { postId }, orderBy: { createdAt: 'asc' } });
+      const comments = await this.prisma.comment.findMany({ 
+        where: { postId }, 
+        orderBy: { createdAt: 'asc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+      });
+
+      return comments.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        author: comment.author.username || comment.author.id,
+        authorId: comment.authorId,
+        postId: comment.postId,
+        parentId: comment.parentId,
+        score: comment.score,
+        createdAt: comment.createdAt,
+        updatedAt: comment.updatedAt,
+      }));
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
