@@ -41,7 +41,7 @@ export class PostsService {
         isSpoiler: post.isSpoiler,
         communityId: post.communityId,
         community: post.community.name,
-        author: post.author.username,
+        author: post.author.username || post.author.id,
         upvotes: post.score,
         commentCount: post.comments.length,
         timeAgo: this.getTimeAgo(post.updatedAt),
@@ -192,7 +192,7 @@ export class PostsService {
         content: post.content,
         imageUrl: post.img,
         community: post.community.name,
-        author: post.author.username,
+        author: post.author.username || post.author.id,
         upvotes: post.score,
         commentCount: this.countAllComments(post.comments),
         timeAgo: this.getTimeAgo(post.updatedAt),
@@ -209,7 +209,7 @@ export class PostsService {
   private formatComment(comment: any): any {
     return {
       id: comment.id,
-      author: comment.author.username,
+      author: comment.author.username || comment.author.id,
       content: comment.content,
       upvotes: comment.score,
       timeAgo: this.getTimeAgo(comment.updatedAt),
