@@ -36,17 +36,19 @@ export class PostsService {
         id: post.id,
         title: post.title,
         content: post.content,
-        img: post.img,
-        isNsfw: post.isNsfw,
-        isSpoiler: post.isSpoiler,
+        img: post.img || null,
+        isNsfw: post.isNsfw || false,
+        isSpoiler: post.isSpoiler || false,
         communityId: post.communityId,
-        community: post.community.name,
-        author: post.author.username || post.author.id,
-        upvotes: post.score,
-        commentCount: post.comments.length,
+        community: post.community?.name || 'Unknown',
+        author: post.author?.username || post.author?.id || 'Unknown',
+        upvotes: post.score || 0,
+        commentCount: post.comments?.length || 0,
         timeAgo: this.getTimeAgo(post.updatedAt),
       }));
     } catch (error) {
+      console.error('Error in findAll:', error);
+      console.error('Error stack:', error.stack);
       throw new InternalServerErrorException('Failed to fetch all posts');
     }
   }
