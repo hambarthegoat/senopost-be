@@ -14,6 +14,12 @@ export class PostsController {
     return this.svc.findAll();
   }
 
+  @Get('posts/:id')
+  @HttpCode(HttpStatus.OK)
+  async findOne(@Param('id') id: string) {
+    return this.svc.findOne(id);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Post('communities/:cid/posts')
   @HttpCode(HttpStatus.CREATED)

@@ -41,13 +41,12 @@ export class PostsService {
         isSpoiler: post.isSpoiler,
         communityId: post.communityId,
         community: post.community.name,
-        author: post.author.username || post.author.id,
+        author: post.author.username,
         upvotes: post.score,
         commentCount: post.comments.length,
         timeAgo: this.getTimeAgo(post.updatedAt),
       }));
     } catch (error) {
-      console.error('Error fetching all posts:', error);
       throw new InternalServerErrorException('Failed to fetch all posts');
     }
   }
